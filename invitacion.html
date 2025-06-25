@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Invitación Baby Shower</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom, #fdfbf8, #f0f8f5);
+      padding: 30px;
+      margin: 0;
+      color: #3d3d3d;
+      text-align: center;
+    }
+
+    #pantalla-codigo, #pantalla-invitacion {
+      background-color: #ffffffd5;
+      border-radius: 14px;
+      padding: 30px;
+      margin: auto;
+      max-width: 450px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.08);
+    }
+
+    input {
+      padding: 10px;
+      width: 80%;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      padding: 10px 18px;
+      background-color: #a0c4b2;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background-color: #8aad9e;
+    }
+
+    a#rsvp {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 10px 15px;
+      background: #92b4ec;
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    #mensaje-error {
+      display: none;
+      color: crimson;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="pantalla-codigo">
+    <h2>👶 ¡Bienvenido al Baby Shower!</h2>
+    <p>Ingresa tu código de invitación:</p>
+    <input type="text" id="codigo" placeholder="Código único" />
+    <br /><br />
+    <button onclick="validarCodigo()">Ingresar</button>
+    <p id="mensaje-error">Código inválido. Por favor verifica e intenta nuevamente.</p>
+  </div>
+
+  <div id="pantalla-invitacion" style="display:none;">
+    <h2 id="titulo"></h2>
+    <p><strong>Fecha:</strong> <span id="fecha"></span></p>
+    <p><strong>Hora:</strong> <span id="hora"></span></p>
+    <p><strong>Ubicación:</strong> <a id="ubicacion" target="_blank"></a></p>
+    <p><strong>Temática:</strong> <span id="tematica"></span></p>
+    <p><strong>Papás:</strong> <span id="padres"></span></p>
+    <p><strong>Invitados Permitidos:</strong> <span id="invitados"></span></p>
+    <a id="regalos" target="_blank" style="display:block; margin:15px 0; color:#607D8B;">🎁 Ver Lista de Regalos</a>
+    <a id="rsvp" target="_blank">Confirmar Asistencia</a>
+  </div>
+
+  <script>
+    async function validarCodigo() {
+      const codigo = document.getElementById('codigo').value.trim();
+      const respuesta = await fetch('https://script.google.com/macros/s/AKfycbxMV4Ys01i4pXK4gXx5eTE0_aXfAT8xsx6RxWp5KelmLrvQVSPX7KscIjUQqFlrtgs2gQ/exec?codigo=' + codigo);
+      
+      try {
+        const datos = await respuesta.json();
+        if (datos.valido) {
+          document.getElementById('pantalla-codigo').style.display = 'none';
+          document.getElementById('pantalla-invitacion').style.display = 'block';
+          document.getElementById('mensaje-error').style.display = 'none';
+
+          document.getElementById('titulo').textContent = datos.titulo;
+          document.getElementById('fecha').textContent = datos.fecha;
+          document.getElementById('hora').textContent = datos.hora;
+          document.getElementById('ubicacion').textContent = datos.ubicacion;
+          document.getElementById('ubicacion').href = datos.enlaceMapa;
+          document.getElementById('tematica').textContent = datos.tematica;
+          document.getElementById('padres').textContent = datos.padres;
+          document.getElementById('invitados').textContent = datos.invitadosPermitidos;
+          document.getElementById('regalos').href = datos.enlaceRegalos;
+          document.getElementById('rsvp').href = datos.enlaceRSVP;
+        } else {
+          document.getElementById('mensaje-error').style.display = 'block';
+        }
+      } catch (error) {
+        document.getElementById('mensaje-error').textContent = 'Hubo un problema al validar el código.';
+        document.getElementById('mensaje-error').style.display = 'block';
+      }
+    }
+  </script>
+
+</body>
+</html>

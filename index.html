@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Baby Shower de Lucia</title>
+  <title>Baby Shower de Nuestro BEBÉ</title>
 
   <!-- Tipografía elegante -->
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet"/>
@@ -108,31 +108,30 @@
 
   <div id="rsvp">
     <h3>💌 Confirmación de asistencia</h3>
-    <p>✨ Queremos celebrar este día contigo.  
-       Por favor confírmanos si puedes asistir, así preparamos todo con mucho amor 💖</p>
+    <p>✨ Queremos celebrar este día contigo.<br>Por favor confírmanos si puedes asistir, así preparamos todo con mucho amor 💖</p>
     <input type="text" id="nombre" placeholder="Tu nombre completo" />
     <input type="number" id="acompanantes" min="0" placeholder="N.º de acompañantes" />
     <br />
     <button onclick="confirmarAsistencia()">Confirmar asistencia</button>
     <p id="rsvp-ok" style="color:green; display:none;">¡Gracias! Registro exitoso 💖</p>
   </div>
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-  import { getDatabase, ref, get, update, push } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getDatabase, ref, get, update, push } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyD1ZDBAiPZiSUU-swsB_h_zecivcGjkHvs",
-    authDomain: "invitacion-babyshower.firebaseapp.com",
-    databaseURL: "https://invitacion-babyshower-default-rtdb.firebaseio.com",
-    projectId: "invitacion-babyshower",
-    storageBucket: "invitacion-babyshower.firebasestorage.app",
-    messagingSenderId: "860574304601",
-    appId: "1:860574304601:web:49d0a6ea082ee94110a448"
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyD1ZDBAiPZiSUU-swsB_h_zecivcGjkHvs",
+      authDomain: "invitacion-babyshower.firebaseapp.com",
+      databaseURL: "https://invitacion-babyshower-default-rtdb.firebaseio.com",
+      projectId: "invitacion-babyshower",
+      storageBucket: "invitacion-babyshower.firebasestorage.app",
+      messagingSenderId: "860574304601",
+      appId: "1:860574304601:web:49d0a6ea082ee94110a448"
+    };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase();
-
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase();
+    let codigoActivo = "";
 
     window.validarCodigo = async function () {
       const input = document.getElementById("codigo").value.trim();
@@ -157,7 +156,7 @@
       }
     };
 
-    window.mostrarElemento = function (id) {
+    function mostrarElemento(id) {
       const el = document.getElementById(id);
       el.style.display = "block";
       setTimeout(() => el.style.opacity = 1, 50);
@@ -168,7 +167,7 @@
       const ics = `BEGIN:VCALENDAR
 VERSION:2.0
 BEGIN:VEVENT
-SUMMARY:Baby Shower de Lucia
+SUMMARY:Baby Shower de Bebé
 DESCRIPTION:Celebración especial 💖
 LOCATION:Jardines del Bosque
 DTSTART:20240720T150000
@@ -177,7 +176,7 @@ END:VEVENT
 END:VCALENDAR`;
       const blob = new Blob([ics], { type: 'text/calendar' });
       enlace.href = URL.createObjectURL(blob);
-      enlace.download = "babyshower_Lucia.ics";
+      enlace.download = "babyshower_sofia.ics";
       enlace.click();
     };
 
@@ -204,7 +203,7 @@ END:VCALENDAR`;
 
     window.elegirRegalo = async function (clave, enlace) {
       const confirmacion = confirm(
-        "🌸 Recuerda: solo podrás elegir un regalo una vez.\nEl que selecciones será reservado para ti.\n¿Estás segur@ de que es el indicado?"
+        "🌸 Recuerda: solo podrás elegir un regalo una vez.\nEl que selecciones será reservado para ti con cariño.\n¿Estás segur@ de que este es el indicado?"
       );
       if (!confirmacion) return;
 

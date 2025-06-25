@@ -180,26 +180,35 @@ END:VCALENDAR`;
       enlace.click();
     };
 
-    window.mostrarRegalos = async function () {
-      const snapshot = await get(ref(db, "regalos"));
-      const regalos = snapshot.val();
-      const contenedor = document.getElementById("lista-regalos");
-      contenedor.innerHTML = "";
+   window.mostrarRegalos = async function () {
+  const snapshot = await get(ref(db, "regalos"));
+  const regalos = snapshot.val();
+  const contenedor = document.getElementById("lista-regalos");
+  contenedor.innerHTML = "";
 
-      for (const key in regalos) {
-        const regalo = regalos[key];
-        if (regalo.seleccionado) continue;
-        const div = document.createElement("div");
-        div.className = "regalo";
-        div.innerHTML = `
-          <h4>${regalo.nombre}</h4>
-          <button onclick="elegirRegalo('${key}', '${regalo.enlace}')">Elegir regalo</button>
-        `;
-        contenedor.appendChild(div);
-      }
+  // 💌 Mensaje de aviso antes de mostrar los regalos
+  const aviso = document.createElement("p");
+  aviso.style.color = "#b06c92";
+  aviso.style.fontStyle = "italic";
+  aviso.style.marginBottom = "16px";
+  aviso.textContent = "🌸 Recuerda: cada invitado puede elegir solo un regalo. Apenas lo selecciones no podrás cambiarlo. ¡Gracias por tu cariño!";
+  contenedor.appendChild(aviso);
 
-      mostrarElemento("lista-regalos");
-    };
+  for (const key in regalos) {
+    const regalo = regalos[key];
+    if (regalo.seleccionado) continue;
+    const div = document.createElement("div");
+    div.className = "regalo";
+    div.innerHTML = `
+      <h4>${regalo.nombre}</h4>
+      <button onclick="elegirRegalo('${key}', '${regalo.enlace}')">Elegir regalo</button>
+    `;
+    contenedor.appendChild(div);
+  }
+
+  mostrarElemento("lista-regalos");
+};
+
 
     window.elegirRegalo = async function (clave, enlace) {
       const confirmacion = confirm(

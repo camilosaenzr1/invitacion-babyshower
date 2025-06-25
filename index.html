@@ -116,11 +116,23 @@
     <button onclick="confirmarAsistencia()">Confirmar asistencia</button>
     <p id="rsvp-ok" style="color:green; display:none;">¡Gracias! Registro exitoso 💖</p>
   </div>
-  <script type="module">
-    import { getDatabase, ref, get, update, push } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+  import { getDatabase, ref, get, update, push } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
-    const db = getDatabase();
-    let codigoActivo = "";
+  const firebaseConfig = {
+    apiKey: "AIzaSyD1ZDBAiPZiSUU-swsB_h_zecivcGjkHvs",
+    authDomain: "invitacion-babyshower.firebaseapp.com",
+    databaseURL: "https://invitacion-babyshower-default-rtdb.firebaseio.com",
+    projectId: "invitacion-babyshower",
+    storageBucket: "invitacion-babyshower.firebasestorage.app",
+    messagingSenderId: "860574304601",
+    appId: "1:860574304601:web:49d0a6ea082ee94110a448"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase();
+
 
     window.validarCodigo = async function () {
       const input = document.getElementById("codigo").value.trim();

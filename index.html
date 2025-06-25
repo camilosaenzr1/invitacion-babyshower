@@ -145,7 +145,7 @@
           mostrarElemento("invitacion");
           mostrarElemento("galeria");
           mostrarElemento("rsvp");
-          document.getElementById("regalos-container").style.display = "block";
+          mostrarElemento("regalos-container");
           document.getElementById("invitados-numero").textContent = codigos[input].invitadosPermitidos;
           document.getElementById("error").style.display = "none";
         } else {
@@ -216,10 +216,17 @@ END:VCALENDAR`;
     };
 
     window.confirmarAsistencia = async function () {
-      const nombre = document.getElementById("nombre").value.trim();
+const nombre = document.getElementById("nombre").value.trim();
+if (!nombre) return alert("Por favor ingresa tu nombre.");
 
-      await push(ref(db, "asistentes"), rsvpData);
-      document.getElementById("rsvp-ok").style.display = "block";
+const rsvpData = {
+  nombre,
+  codigo: codigoActivo
+};
+
+await push(ref(db, "asistentes"), rsvpData);
+document.getElementById("rsvp-ok").style.display = "block";
+
     };
   </script>
 

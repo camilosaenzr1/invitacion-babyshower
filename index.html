@@ -3,26 +3,123 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Invitación Baby Shower</title>
+  <title>Baby Shower de Lucia</title>
 
-  <!-- Firebase SDK -->
+  <!-- Tipografía elegante -->
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet"/>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #fff9f5;
+      text-align: center;
+      padding: 1em;
+      margin: 0;
+      transition: all 0.3s ease-in-out;
+    }
+    h2, h3 {
+      font-family: 'Great Vibes', cursive;
+      color: #b06c92;
+    }
+    img {
+      max-width: 180px;
+      margin: 20px auto;
+    }
+    #invitacion, #regalos-container, #galeria, #rsvp {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.6s ease-in-out;
+    }
+    .regalo {
+      background: #ffffff;
+      padding: 12px;
+      margin: 12px auto;
+      border-radius: 10px;
+      max-width: 420px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+    }
+    button {
+      background: #b06c92;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      margin: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #944f7d;
+    }
+    input {
+      padding: 10px;
+      width: 80%;
+      margin-bottom: 12px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    .galeria-img {
+      width: 30%;
+      margin: 10px 5px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    @media (max-width: 500px) {
+      .galeria-img {
+        width: 80%;
+        margin: 8px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <img src="imagen.png" alt="Imagen de bebé" />
+
+  <div id="codigo-section">
+    <h2>Invitación especial</h2>
+    <p>Ingresa tu código de acceso:</p>
+    <input type="text" id="codigo" placeholder="Código de invitación" />
+    <br />
+    <button onclick="validarCodigo()">Ingresar</button>
+    <p id="error" style="color: crimson; display: none;">Código inválido. Intenta de nuevo</p>
+  </div>
+
+  <div id="invitacion">
+    <h3>✨ ¡Te esperamos!</h3>
+    <p>📅 <strong>20 de Octubre del 2025</strong> - <strong>3:00 PM</strong></p>
+    <p>📍 Jardines del Bosque</p>
+    <p>👨‍👩‍👧 Invitados permitidos: <span id="invitados-numero"></span></p>
+    <p style="margin-top: 1em;">🍼 <em>Lleva pañales y pañitos</em></p>
+    <p>🎁 <em>Si deseas llevar un regalo, elige el tuyo ¡</em></p>
+    <button onclick="descargarICS()">Agregar al calendario 📅</button>
+  </div>
+
+  <div id="regalos-container" style="display:none;">
+    <button onclick="mostrarRegalos()">🎁 Ver lista de regalos</button>
+    <div id="lista-regalos" style="display:none; margin-top:20px;"></div>
+  </div>
+
+  <div id="galeria">
+    <h3>📸 Momentos para recordar</h3>
+    <img class="galeria-img" src="g1.jpg" alt="foto 1" />
+    <img class="galeria-img" src="g2.jpg" alt="foto 2" />
+    <img class="galeria-img" src="g3.jpg" alt="foto 3" />
+  </div>
+
+  <div id="rsvp">
+    <h3>💌 Confirmación de asistencia</h3>
+    <p>✨ Queremos celebrar este día contigo.  
+       Por favor confírmanos si puedes asistir, así preparamos todo con mucho amor 💖</p>
+    <input type="text" id="nombre" placeholder="Tu nombre completo" />
+    <input type="number" id="acompanantes" min="0" placeholder="N.º de acompañantes" />
+    <br />
+    <button onclick="confirmarAsistencia()">Confirmar asistencia</button>
+    <p id="rsvp-ok" style="color:green; display:none;">¡Gracias! Registro exitoso 💖</p>
+  </div>
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-    import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+    import { getDatabase, ref, get, update, push } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyD1ZDBAiPZiSUU-swsB_h_zecivcGjkHvs",
-      authDomain: "invitacion-babyshower.firebaseapp.com",
-      databaseURL: "https://invitacion-babyshower-default-rtdb.firebaseio.com",
-      projectId: "invitacion-babyshower",
-      storageBucket: "invitacion-babyshower.firebasestorage.app",
-      messagingSenderId: "860574304601",
-      appId: "1:860574304601:web:49d0a6ea082ee94110a448"
-    };
-
-    const app = initializeApp(firebaseConfig);
     const db = getDatabase();
-
     let codigoActivo = "";
 
     window.validarCodigo = async function () {
@@ -34,28 +131,53 @@
         if (codigos[input]) {
           codigoActivo = input;
           document.getElementById("codigo-section").style.display = "none";
-          document.getElementById("invitacion").style.display = "block";
-          document.getElementById("regalos-section").style.display = "block";
-          document.getElementById("error").style.display = "none";
+          mostrarElemento("invitacion");
+          mostrarElemento("galeria");
+          mostrarElemento("rsvp");
+          document.getElementById("regalos-container").style.display = "block";
           document.getElementById("invitados-numero").textContent = codigos[input].invitadosPermitidos;
-          await cargarRegalos();
+          document.getElementById("error").style.display = "none";
         } else {
           document.getElementById("error").style.display = "block";
         }
       } catch (e) {
-        alert("Error al cargar códigos. Verifica que codigos.json esté presente.");
+        alert("Error al cargar codigos.json");
       }
     };
 
-    window.cargarRegalos = async function () {
-      const snapshot = await get(ref(db, 'regalos'));
+    window.mostrarElemento = function (id) {
+      const el = document.getElementById(id);
+      el.style.display = "block";
+      setTimeout(() => el.style.opacity = 1, 50);
+    }
+
+    window.descargarICS = function () {
+      const enlace = document.createElement("a");
+      const ics = `BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VEVENT
+SUMMARY:Baby Shower de Lucia
+DESCRIPTION:Celebración especial 💖
+LOCATION:Jardines del Bosque
+DTSTART:20240720T150000
+DTEND:20240720T170000
+END:VEVENT
+END:VCALENDAR`;
+      const blob = new Blob([ics], { type: 'text/calendar' });
+      enlace.href = URL.createObjectURL(blob);
+      enlace.download = "babyshower_Lucia.ics";
+      enlace.click();
+    };
+
+    window.mostrarRegalos = async function () {
+      const snapshot = await get(ref(db, "regalos"));
       const regalos = snapshot.val();
       const contenedor = document.getElementById("lista-regalos");
       contenedor.innerHTML = "";
+
       for (const key in regalos) {
         const regalo = regalos[key];
         if (regalo.seleccionado) continue;
-
         const div = document.createElement("div");
         div.className = "regalo";
         div.innerHTML = `
@@ -64,91 +186,37 @@
         `;
         contenedor.appendChild(div);
       }
+
+      mostrarElemento("lista-regalos");
     };
 
     window.elegirRegalo = async function (clave, enlace) {
+      const confirmacion = confirm(
+        "🌸 Recuerda: solo podrás elegir un regalo una vez.\nEl que selecciones será reservado para ti.\n¿Estás segur@ de que es el indicado?"
+      );
+      if (!confirmacion) return;
+
       const updates = {};
       updates[`regalos/${clave}/seleccionado`] = true;
+      updates[`regalos/${clave}/elegidoPor`] = codigoActivo;
       await update(ref(db), updates);
       window.open(enlace, "_blank");
-      await cargarRegalos();
+      await mostrarRegalos();
+    };
+
+    window.confirmarAsistencia = async function () {
+      const nombre = document.getElementById("nombre").value.trim();
+      const acompanantes = document.getElementById("acompanantes").value.trim();
+      if (!nombre || acompanantes === "") return alert("Por favor completa todos los campos.");
+      const rsvpData = {
+        nombre,
+        acompanantes: parseInt(acompanantes),
+        codigo: codigoActivo
+      };
+      await push(ref(db, "asistentes"), rsvpData);
+      document.getElementById("rsvp-ok").style.display = "block";
     };
   </script>
-
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #fdfbf8;
-      margin: 0;
-      padding: 1em;
-      text-align: center;
-    }
-    img {
-      width: 160px;
-      margin-top: 20px;
-    }
-    #invitacion, #regalos-section {
-      display: none;
-      margin-top: 20px;
-    }
-    .regalo {
-      background: #fff;
-      padding: 12px;
-      margin: 10px auto;
-      border-radius: 8px;
-      max-width: 400px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-    }
-    button {
-      background: #a0c4b2;
-      color: #fff;
-      padding: 10px 18px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #8aad9e;
-    }
-    input {
-      padding: 10px;
-      width: 70%;
-      margin-bottom: 10px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-    @media (max-width: 480px) {
-      h2 { font-size: 1.4em; }
-      button, input { width: 90%; }
-    }
-  </style>
-</head>
-
-<body>
-
-  <img src="imagen.png" alt="bebé" />
-
-  <div id="codigo-section">
-    <h2>🎀 Baby Shower de Lucia</h2>
-    <p>Ingresa tu código de invitación:</p>
-    <input type="text" id="codigo" placeholder="Código de acceso" />
-    <br>
-    <button onclick="validarCodigo()">Ingresar</button>
-    <p id="error" style="color:crimson; display:none;">Código inválido. Intenta de nuevo.</p>
-  </div>
-
-  <div id="invitacion">
-    <h3>🎉 ¡Estás invitado!</h3>
-    <p><strong>Fecha:</strong> 20 de Octubre del 2025</p>
-    <p><strong>Hora:</strong> 3:00 PM</p>
-    <p><strong>Ubicación:</strong> Jardines del Bosque</p>
-    <p><strong>Invitados permitidos:</strong> <span id="invitados-numero"></span></p>
-  </div>
-
-  <div id="regalos-section">
-    <h3 style="margin-top: 40px;">🎁 Lista de regalos</h3>
-    <div id="lista-regalos"></div>
-  </div>
 
 </body>
 </html>

@@ -94,10 +94,10 @@
     <button onclick="descargarICS()">Agregar al calendario 📅</button>
   </div>
 
-  <div id="regalos-container" style="display:none;">
-    <button onclick="mostrarRegalos()">🎁 Ver lista de regalos</button>
-    <div id="lista-regalos" style="display:none; margin-top:20px;"></div>
-  </div>
+<div id="regalos-container" style="display:none;">
+  <button onclick="mostrarRegalos()">🎁 Ver lista de regalos</button>
+  <div id="lista-regalos" style="display:none; margin-top:20px;"></div>
+</div>
 
   <div id="galeria">
     <h3>📸 Momentos para recordar</h3>
@@ -110,7 +110,7 @@
     <h3>💌 Confirmación de asistencia</h3>
     <p>✨ Queremos celebrar este día contigo.<br>Por favor confírmanos si puedes asistir, así preparamos todo con mucho amor 💖</p>
     <input type="text" id="nombre" placeholder="Tu nombre completo" />
-    <input type="number" id="acompanantes" min="0" placeholder="N.º de acompañantes" />
+   
     <br />
     <button onclick="confirmarAsistencia()">Confirmar asistencia</button>
     <p id="rsvp-ok" style="color:green; display:none;">¡Gracias! Registro exitoso 💖</p>
@@ -217,13 +217,7 @@ END:VCALENDAR`;
 
     window.confirmarAsistencia = async function () {
       const nombre = document.getElementById("nombre").value.trim();
-      const acompanantes = document.getElementById("acompanantes").value.trim();
-      if (!nombre || acompanantes === "") return alert("Por favor completa todos los campos.");
-      const rsvpData = {
-        nombre,
-        acompanantes: parseInt(acompanantes),
-        codigo: codigoActivo
-      };
+
       await push(ref(db, "asistentes"), rsvpData);
       document.getElementById("rsvp-ok").style.display = "block";
     };

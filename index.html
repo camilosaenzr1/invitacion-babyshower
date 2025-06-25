@@ -4,120 +4,151 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Invitación Baby Shower</title>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD1ZDBAiPZiSUU-swsB_h_zecivcGjkHvs",
+      authDomain: "invitacion-babyshower.firebaseapp.com",
+      databaseURL: "https://invitacion-babyshower-default-rtdb.firebaseio.com",
+      projectId: "invitacion-babyshower",
+      storageBucket: "invitacion-babyshower.firebasestorage.app",
+      messagingSenderId: "860574304601",
+      appId: "1:860574304601:web:49d0a6ea082ee94110a448"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase();
+
+    let codigoActivo = "";
+
+    window.validarCodigo = async function () {
+      const input = document.getElementById("codigo").value.trim();
+      try {
+        const res = await fetch("codigos.json");
+        const codigos = await res.json();
+
+        if (codigos[input]) {
+          codigoActivo = input;
+          document.getElementById("codigo-section").style.display = "none";
+          document.getElementById("invitacion").style.display = "block";
+          document.getElementById("regalos-section").style.display = "block";
+          document.getElementById("error").style.display = "none";
+          document.getElementById("invitados-numero").textContent = codigos[input].invitadosPermitidos;
+          await cargarRegalos();
+        } else {
+          document.getElementById("error").style.display = "block";
+        }
+      } catch (e) {
+        alert("Error al cargar códigos. Verifica que codigos.json esté presente.");
+      }
+    };
+
+    window.cargarRegalos = async function () {
+      const snapshot = await get(ref(db, 'regalos'));
+      const regalos = snapshot.val();
+      const contenedor = document.getElementById("lista-regalos");
+      contenedor.innerHTML = "";
+      for (const key in regalos) {
+        const regalo = regalos[key];
+        if (regalo.seleccionado) continue;
+
+        const div = document.createElement("div");
+        div.className = "regalo";
+        div.innerHTML = `
+          <h4>${regalo.nombre}</h4>
+          <button onclick="elegirRegalo('${key}', '${regalo.enlace}')">Elegir regalo</button>
+        `;
+        contenedor.appendChild(div);
+      }
+    };
+
+    window.elegirRegalo = async function (clave, enlace) {
+      const updates = {};
+      updates[`regalos/${clave}/seleccionado`] = true;
+      await update(ref(db), updates);
+      window.open(enlace, "_blank");
+      await cargarRegalos();
+    };
+  </script>
+
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to bottom, #fdfbf8, #f0f8f5);
-      padding: 30px;
+      background: #fdfbf8;
       margin: 0;
-      color: #3d3d3d;
+      padding: 1em;
       text-align: center;
     }
-
-    #pantalla-codigo, #pantalla-invitacion {
-      background-color: #ffffffd5;
-      border-radius: 14px;
-      padding: 30px;
-      margin: auto;
-      max-width: 450px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.08);
+    img {
+      width: 160px;
+      margin-top: 20px;
     }
-
-    input {
-      padding: 10px;
-      width: 80%;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      margin-bottom: 10px;
+    #invitacion, #regalos-section {
+      display: none;
+      margin-top: 20px;
     }
-
+    .regalo {
+      background: #fff;
+      padding: 12px;
+      margin: 10px auto;
+      border-radius: 8px;
+      max-width: 400px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    }
     button {
-      padding: 10px 18px;
-      background-color: #a0c4b2;
+      background: #a0c4b2;
       color: #fff;
+      padding: 10px 18px;
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      font-weight: bold;
     }
-
     button:hover {
       background-color: #8aad9e;
     }
-
-    a#rsvp {
-      display: inline-block;
-      margin-top: 15px;
-      padding: 10px 15px;
-      background: #92b4ec;
-      color: white;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: bold;
+    input {
+      padding: 10px;
+      width: 70%;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
     }
-
-    #mensaje-error {
-      display: none;
-      color: crimson;
-      font-weight: bold;
-      margin-top: 10px;
+    @media (max-width: 480px) {
+      h2 { font-size: 1.4em; }
+      button, input { width: 90%; }
     }
   </style>
 </head>
+
 <body>
 
-  <div id="pantalla-codigo">
-    <h2>👶 ¡Bienvenido al Baby Shower!</h2>
+  <img src="imagen.png" alt="bebé" />
+
+  <div id="codigo-section">
+    <h2>🎀 Baby Shower de Lucia</h2>
     <p>Ingresa tu código de invitación:</p>
-    <input type="text" id="codigo" placeholder="Código único" />
-    <br /><br />
+    <input type="text" id="codigo" placeholder="Código de acceso" />
+    <br>
     <button onclick="validarCodigo()">Ingresar</button>
-    <p id="mensaje-error">Código inválido. Por favor verifica e intenta nuevamente.</p>
+    <p id="error" style="color:crimson; display:none;">Código inválido. Intenta de nuevo.</p>
   </div>
 
-  <div id="pantalla-invitacion" style="display:none;">
-    <h2 id="titulo"></h2>
-    <p><strong>Fecha:</strong> <span id="fecha"></span></p>
-    <p><strong>Hora:</strong> <span id="hora"></span></p>
-    <p><strong>Ubicación:</strong> <a id="ubicacion" target="_blank"></a></p>
-    <p><strong>Temática:</strong> <span id="tematica"></span></p>
-    <p><strong>Papás:</strong> <span id="padres"></span></p>
-    <p><strong>Invitados Permitidos:</strong> <span id="invitados"></span></p>
-    <a id="regalos" target="_blank" style="display:block; margin:15px 0; color:#607D8B;">🎁 Ver Lista de Regalos</a>
-    <a id="rsvp" target="_blank">Confirmar Asistencia</a>
+  <div id="invitacion">
+    <h3>🎉 ¡Estás invitado!</h3>
+    <p><strong>Fecha:</strong> 20 de Octubre del 2025</p>
+    <p><strong>Hora:</strong> 3:00 PM</p>
+    <p><strong>Ubicación:</strong> Jardines del Bosque</p>
+    <p><strong>Invitados permitidos:</strong> <span id="invitados-numero"></span></p>
   </div>
 
-  <script>
-    async function validarCodigo() {
-      const codigo = document.getElementById('codigo').value.trim();
-      const respuesta = await fetch('https://script.google.com/macros/s/AKfycbxMV4Ys01i4pXK4gXx5eTE0_aXfAT8xsx6RxWp5KelmLrvQVSPX7KscIjUQqFlrtgs2gQ/exec?codigo=' + codigo);
-      
-      try {
-        const datos = await respuesta.json();
-        if (datos.valido) {
-          document.getElementById('pantalla-codigo').style.display = 'none';
-          document.getElementById('pantalla-invitacion').style.display = 'block';
-          document.getElementById('mensaje-error').style.display = 'none';
-
-          document.getElementById('titulo').textContent = datos.titulo;
-          document.getElementById('fecha').textContent = datos.fecha;
-          document.getElementById('hora').textContent = datos.hora;
-          document.getElementById('ubicacion').textContent = datos.ubicacion;
-          document.getElementById('ubicacion').href = datos.enlaceMapa;
-          document.getElementById('tematica').textContent = datos.tematica;
-          document.getElementById('padres').textContent = datos.padres;
-          document.getElementById('invitados').textContent = datos.invitadosPermitidos;
-          document.getElementById('regalos').href = datos.enlaceRegalos;
-          document.getElementById('rsvp').href = datos.enlaceRSVP;
-        } else {
-          document.getElementById('mensaje-error').style.display = 'block';
-        }
-      } catch (error) {
-        document.getElementById('mensaje-error').textContent = 'Hubo un problema al validar el código.';
-        document.getElementById('mensaje-error').style.display = 'block';
-      }
-    }
-  </script>
+  <div id="regalos-section">
+    <h3 style="margin-top: 40px;">🎁 Lista de regalos</h3>
+    <div id="lista-regalos"></div>
+  </div>
 
 </body>
 </html>
